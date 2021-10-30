@@ -1,0 +1,21 @@
+
+*.swp
+
+# IDEs
+.vscode/*
+!.vscode/launch.json
+.idea/
+*.iml
+.bsp/
+
+# Mac
+.DS_Store
+
+# Scala
+target
+
+# Data and shortcuts
+data
+sieve.jar
+run-*.sh
+

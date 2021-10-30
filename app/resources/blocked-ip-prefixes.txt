@@ -1,0 +1,6 @@
+# This is a comment and ignored, just like blank lines.
+# These are not true IP prefixes, but simple string prefixes.
+# As such, they will exclude the entire prefix space like /8, /16 or /24.
+
+# Google crawlerbot from https://www.gstatic.com/ipranges/goog.json
+66.249.

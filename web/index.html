@@ -1,0 +1,155 @@
+<html>
+<head>
+    <script src="/libs/Chart.js-3.7.0.min.js"></script>
+    <script>
+        window.loadAnalytics = function() {
+            const siteSelect = document.getElementById('site-select')
+            const selectedOptions = siteSelect.selectedOptions
+            if (selectedOptions.length === 0 || !selectedOptions[0].hasAttribute('value')) {
+                console.error('No site selected, or missing value attribute, not loading analytics.')
+                return
+            }
+
+            const siteId = selectedOptions[0].getAttribute('value')
+            console.log('Loading analytics for ' + siteId)
+
+            fetch(`/data/${siteId}.json`).then(response => response.json()).then(data => {
+                let maxMonthStarts = 3
+                let startIdx = 0
+                for (let i = data.daily.length - 1; i >= 0; i--) {
+                    if (data.daily[i].date.endsWith("01")) {
+                        maxMonthStarts -= 1
+                        if (maxMonthStarts === 0) {
+                            startIdx = i
+                            break
+                        }
+                    }
+                }
+                console.log('Dropping ' + startIdx + ' elements from daily')
+                const daily = data.daily.slice(startIdx)
+                const dateLabels = daily.map(day => day.date)
+                const dateVisitors = daily.map(day => day.visitors)
+
+                const existingChart = Chart.getChart('visitors-chart')
+                if (existingChart) {
+                    existingChart.destroy()
+                }
+
+                const ctx = document.getElementById('visitors-chart')
+                const myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dateLabels,
+                        datasets: [{
+                            label: 'Visitors',
+                            data: dateVisitors,
+                            backgroundColor: ['rgba(99, 200, 132, 0.5)'],
+                            borderColor: ['rgba(99, 200, 132, 0.5)'],
+                            fill: true,
+                            tension: 0.2
+                        }]
+                    },
+                });
+
+                // Show current month's referrals and pages.
+                if (data.monthly.length > 0) {
+                    const month = data.monthly[data.monthly.length - 1]
+                    console.log('Current month: ' + month.id)
+                    document.getElementById('month-name').innerText = month.name
+
+                    const sortTakeAndAdd = function(dict, count, targetElement) {
+                        let items = Object.keys(dict).map(function(key) {
+                            return [key, dict[key]]
+                        })
+
+                        items.sort(function(first, second) {
+                            return second[1] - first[1]
+                        })
+
+                        const itemsToAdd = items.slice(0, count)
+
+                        while (targetElement.firstChild) {
+                            targetElement.removeChild(targetElement.firstChild);
+                        }
+
+                        for (let i = 0; i < itemsToAdd.length; i++) {
+                            const row = document.createElement('DIV')
+                            row.setAttribute('style', 'display: flex; flex-direction: row; margin-top: 6px;')
+
+                            const left = document.createElement('DIV')
+                            left.setAttribute('style', 'width: 24px; text-align: right;')
+                            left.innerText = `${itemsToAdd[i][1]}`
+                            const right = document.createElement('DIV')
+                            right.setAttribute('style', 'margin-left: 12px;')
+                            right.innerText = `${itemsToAdd[i][0]}`
+
+                            row.appendChild(left)
+                            row.appendChild(right)
+
+                            targetElement.appendChild(row)
+                        }
+                    }
+
+                    sortTakeAndAdd(month.referrals, 10, document.getElementById('referral-table'))
+                    sortTakeAndAdd(month.pages, 10, document.getElementById('pages-table'))
+                }
+            })
+        }
+
+        window.loadSites = function() {
+            fetch('/data/sites.json').then(response => response.json()).then(data => {
+                const siteSelect = document.getElementById('site-select')
+                for (let i = 0; i < data.sites.length; i++) {
+                    const element = document.createElement('OPTION')
+                    element.setAttribute('value', data.sites[i].id)
+                    element.innerText = data.sites[i].name
+                    siteSelect.appendChild(element)
+
+                    if (i === 0) {
+                        siteSelect.value = data.sites[i].id
+                    }
+                }
+
+                siteSelect.addEventListener('change', function (e) {
+                    window.loadAnalytics()
+                })
+
+                // And call it once to kick things off.
+                window.loadAnalytics()
+            })
+        }
+    </script>
+</head>
+<body>
+<div id="picker" style="margin: 36px;">
+    <label for="site-select">Site:</label>
+
+    <select name="sites" id="site-select"></select>
+    <script>
+        window.loadSites()
+    </script>
+</div>
+<div style="margin: 36px 0px;">
+    <div id="visitors-chart-wrapper" style="width: 800px; height: 400px; margin: auto;">
+        <canvas id="visitors-chart" width="800" height="400"></canvas>
+    </div>
+    <div id="second-row" style="margin-top: 36px; margin-left: auto; margin-right: auto; width: 800px;">
+        <h2 id="month-name" style="margin: 6px 0px;"></h2>
+        <div style="display: flex; flex-direction: row;">
+            <div style="width: 50%;">
+                <h3 style="margin: 6px 0px;">Referrals</h3>
+                <div id="referral-table" style="display: flex; flex-direction: column;">
+                    <div style="display: flex; flex-direction: row;">
+                        <div style="width: 24px; text-align: right;">23</div><div style="margin-left: 12px;">google.com</div>
+                    </div>
+                </div>
+            </div>
+            <div style="width: 50%;">
+                <h3 style="margin: 6px 0px;">Top Pages</h3>
+                <div id="pages-table">Table:</div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
