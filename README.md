@@ -95,6 +95,25 @@ Note that you can save that command into a file named `run-my-site.sh` in the re
 and the `.gitignore` file will exclude it.
 This allows you to have multiple `run-X.sh` files for each website that you track.
 
+#### Installing a Site
+
+The server loads the `index.html` page which fetches the file at `web/data/sites.json`.
+This file is ignored in Git so you can add your own `my-site.json` file (computed from above).
+The format of this file is very basic:
+```json
+{
+  "sites": [
+    {"id": "my-site", "name": "My Special Site"},
+    {"id": "other-site", "name": "My Other Site"}
+  ]
+}
+```
+
+The `id` field must match the filename (ignoring filetype suffix) of your computed .json file.
+You only need to add your site entry to this file once and
+as long as future computations of your data update the same file,
+then the server will serve the latest version.
+
 #### Viewing Analytics
 
 To view the computed analytics for any sites with a `.json` file in `web/data/`,
@@ -108,8 +127,6 @@ then navigate to `http://localhost:8080/`.
 You should see a Visitors graph and other metrics.
 You can toggle between your sites with the dropdown at the top left.
 
-**NOTE: To install a new site, add an entry to `web/data/sites.json`.** 
-The sites are loaded dynamically by reading `web/data/sites.json`.
 
 Discussion
 ------
