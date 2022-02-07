@@ -37,7 +37,7 @@ object SieveMain extends App {
   private def runComputeTask(task: ComputeTask): Unit = {
     println(s"Computing SieveAnalytics from ${task.logsDirPath}")
     val filter = new SieveFilter(SieveFilterConfig(
-      keepOnly2xx = true,
+      keepOnly2xx3xx = true,
       ipPrefixBlockFilePath = Some("app/resources/blocked-ip-prefixes.txt")
     ))
 

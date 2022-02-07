@@ -1,7 +1,7 @@
 import java.io.File
 
 case class SieveFilterConfig(
-  keepOnly2xx: Boolean,
+  keepOnly2xx3xx: Boolean,
   ipPrefixBlockFilePath: Option[String]
 )
 
@@ -22,7 +22,8 @@ class SieveFilter(config: SieveFilterConfig) {
   }).getOrElse(Set.empty[String])
 
   def isBlocked(request: LoggedRequest): Boolean = {
-    (config.keepOnly2xx && (request.sc_status / 100) != 2) ||
+    val typ = request.sc_status / 100
+    (config.keepOnly2xx3xx && !Set(2, 3).contains(typ)) ||
       (request.c_ip.exists(ip => blockedPrefixIPs.exists(ip.startsWith)))
   }
 }
