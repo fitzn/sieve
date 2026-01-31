@@ -4,10 +4,10 @@
 # Validate arguments.
 #
 
-RequiredSieveJar=app/target/sieve.jar
+RequiredSieveEntry=app/SieveMain.ts
 
-if [ ! -f $RequiredSieveJar ]; then
-  echo "error: missing required file $RequiredSieveJar"
+if [ ! -f $RequiredSieveEntry ]; then
+  echo "error: missing required file $RequiredSieveEntry"
   exit 1
 fi
 
@@ -30,7 +30,7 @@ fi
 #
 
 PreviousMonthsSync=3
-scala -cp $RequiredSieveJar SieveMain months $PreviousMonthsSync | \
+bun run $RequiredSieveEntry months $PreviousMonthsSync | \
   while read prefix ; do
     echo "Syncing $prefix:"
     aws s3 sync --exclude="*" --include="*$prefix*" s3://$BucketAndPath $LogDirectory
@@ -40,4 +40,4 @@ scala -cp $RequiredSieveJar SieveMain months $PreviousMonthsSync | \
 # Compute the analytics from the local logs.
 #
 
-scala -cp $RequiredSieveJar SieveMain compute $LogDirectory $OutputFile
+bun run $RequiredSieveEntry compute $LogDirectory $OutputFile

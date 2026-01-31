@@ -1,11 +1,8 @@
 #!/bin/bash
 
-OutputJarfile=app/target/sieve.jar
+# This script is kept for backward compatibility but is no longer needed with Bun.
+# TypeScript files are executed directly by Bun without compilation.
 
-if [ ! -d app/target ] ; then
-  mkdir app/target
-fi
-
-scalac app/*.scala -d $OutputJarfile
-
-jar -uf $OutputJarfile app/resources/
+echo "Note: With Bun/TypeScript, no build step is required."
+echo "TypeScript files are executed directly by Bun."
+echo "This script is kept for backward compatibility."

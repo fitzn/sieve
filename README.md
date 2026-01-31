@@ -46,16 +46,11 @@ you can use Sieve right out of the box!**
 Installation
 -----
 
-1. Download and install a [JVM](https://www.java.com/en/download/).
-2. Download and install [Scala](http://www.scala-lang.org/download/).
-3. Install the [AWS CLI](https://aws.amazon.com/cli/).
-4. Install [Node](https://nodejs.org/)
-5. Download or clone the Sieve Git repository.
-6. Run:
-```bash
-$ ./make-jar.sh
-```
-to create `app/target/sieve.jar`.
+1. Download and install [Bun](https://bun.sh/).
+2. Install the [AWS CLI](https://aws.amazon.com/cli/).
+3. Install [Node](https://nodejs.org/) (for the web server)
+4. Download or clone the Sieve Git repository.
+5. No build step is required - Bun executes TypeScript files directly!
 
 
 Usage

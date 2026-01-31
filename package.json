@@ -1,0 +1,18 @@
+{
+  "name": "sieve",
+  "version": "1.0.0",
+  "description": "Produce basic website analytics from server or CDN request logs",
+  "type": "module",
+  "scripts": {
+    "build": "bun build app/SieveMain.ts --outfile app/target/sieve.js --target node",
+    "months": "bun run app/SieveMain.ts months",
+    "compute": "bun run app/SieveMain.ts compute"
+  },
+  "keywords": ["analytics", "cloudfront", "logs"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.10.0"
+  }
+}
