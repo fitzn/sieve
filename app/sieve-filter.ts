@@ -1,5 +1,4 @@
-import { readFileSync } from 'fs';
-import { LoggedRequest } from './Model';
+import { LoggedRequest } from './model';
 
 export interface SieveFilterConfig {
   keepOnly2xx3xx: boolean;
@@ -9,23 +8,30 @@ export interface SieveFilterConfig {
 export class SieveFilter {
   private blockedPrefixIPs: Set<string>;
 
-  constructor(private config: SieveFilterConfig) {
-    this.blockedPrefixIPs = new Set();
+  private constructor(private config: SieveFilterConfig, blockedPrefixes: Set<string>) {
+    this.blockedPrefixIPs = blockedPrefixes;
+  }
+
+  static async create(config: SieveFilterConfig): Promise<SieveFilter> {
+    let blockedPrefixIPs = new Set<string>();
 
     if (config.ipPrefixBlockFilePath) {
       try {
-        const content = readFileSync(config.ipPrefixBlockFilePath, 'utf-8');
+        const file = Bun.file(config.ipPrefixBlockFilePath);
+        const content = await file.text();
         const lines = content.split('\n')
           .map(line => line.trim())
           .filter(line => line.length > 0)
           .filter(line => !line.startsWith('#'));
         
-        this.blockedPrefixIPs = new Set(lines);
+        blockedPrefixIPs = new Set(lines);
       } catch (e) {
         console.log(`error: failed to load IP prefix block file ${config.ipPrefixBlockFilePath}`);
-        this.blockedPrefixIPs = new Set();
+        blockedPrefixIPs = new Set();
       }
     }
+
+    return new SieveFilter(config, blockedPrefixIPs);
   }
 
   isBlocked(request: LoggedRequest): boolean {

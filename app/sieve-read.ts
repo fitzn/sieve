@@ -1,18 +1,15 @@
-import { readFileSync, readdirSync } from 'fs';
-import { gunzipSync } from 'zlib';
-import { LoggedRequest, LogSlice } from './Model';
+import { LoggedRequest, LogSlice } from './model';
 
 export const CF_LOGS_VERSION_ONE_HEADER = '#Version: 1.0';
 
-export function readCloudFrontLogsDir(path: string): LogSlice[] {
-  const files = readdirSync(path, { withFileTypes: true })
-    .filter(dirent => dirent.isFile())
-    .map(dirent => dirent.name)
-    .sort();
+export async function readCloudFrontLogsDir(path: string): Promise<LogSlice[]> {
+  const dir = new Bun.Glob('*').scanSync({ cwd: path, onlyFiles: true });
+  const files = Array.from(dir).sort();
 
-  return files.map(filename => {
+  const results: LogSlice[] = [];
+  for (const filename of files) {
     const fullPath = `${path}/${filename}`;
-    const contents = readGzipFileLines(fullPath);
+    const contents = await readGzipFileLines(fullPath);
     const allRequests = contents.filter(line => !line.startsWith('#'));
 
     let requests: LoggedRequest[] = [];
@@ -25,12 +22,14 @@ export function readCloudFrontLogsDir(path: string): LogSlice[] {
         .filter((req): req is LoggedRequest => req !== null);
     }
 
-    return {
+    results.push({
       filename,
       requests,
       numSkipped: allRequests.length - requests.length
-    };
-  });
+    });
+  }
+
+  return results;
 }
 
 export function parseCloudFrontLoggedRequestV1(line: string): LoggedRequest | null {
@@ -87,9 +86,10 @@ export function parseCloudFrontLoggedRequestV1(line: string): LoggedRequest | nu
 
 // NOTE: This gunzips the whole file into memory.
 // Our hope is that CF has some reasonable max size / # of requests for a single log file.
-export function readGzipFileLines(filepath: string): string[] {
-  const compressed = readFileSync(filepath);
-  const decompressed = gunzipSync(compressed);
-  const content = decompressed.toString('utf-8');
+export async function readGzipFileLines(filepath: string): Promise<string[]> {
+  const file = Bun.file(filepath);
+  const bytes = await file.arrayBuffer();
+  const decompressed = Bun.gunzipSync(new Uint8Array(bytes));
+  const content = new TextDecoder().decode(decompressed);
   return content.split('\n');
 }

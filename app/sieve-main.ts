@@ -1,8 +1,7 @@
-import { writeFileSync } from 'fs';
-import { SieveAnalyzer } from './SieveAnalyzer';
-import { SieveFilter } from './SieveFilter';
-import { readCloudFrontLogsDir } from './SieveRead';
-import { analyticsToJson } from './Model';
+import { SieveAnalyzer } from './sieve-analyzer';
+import { SieveFilter } from './sieve-filter';
+import { readCloudFrontLogsDir } from './sieve-read';
+import { analyticsToJson } from './model';
 
 const COMMAND_MONTHS = 'months';
 const COMMAND_COMPUTE = 'compute';
@@ -20,14 +19,14 @@ interface ComputeTask {
   outputFile: string;
 }
 
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   const task = validateArgs(args);
   
   if (task.type === 'months') {
     runMonthsTask(task);
   } else {
-    runComputeTask(task);
+    await runComputeTask(task);
   }
 }
 
@@ -51,17 +50,17 @@ function runMonthsTask(task: MonthsTask): void {
   prefixes.forEach(prefix => console.log(prefix));
 }
 
-function runComputeTask(task: ComputeTask): void {
+async function runComputeTask(task: ComputeTask): Promise<void> {
   console.log(`Computing SieveAnalytics from ${task.logsDirPath}`);
   
-  const filter = new SieveFilter({
+  const filter = await SieveFilter.create({
     keepOnly2xx3xx: true,
     ipPrefixBlockFilePath: 'app/resources/blocked-ip-prefixes.txt'
   });
 
   const analyzer = new SieveAnalyzer(filter);
 
-  const slices = readCloudFrontLogsDir(task.logsDirPath);
+  const slices = await readCloudFrontLogsDir(task.logsDirPath);
   
   for (const slice of slices) {
     if (slice.numSkipped > 0) {
@@ -76,7 +75,7 @@ function runComputeTask(task: ComputeTask): void {
 
   const analytics = analyzer.compute();
   const json = analyticsToJson(analytics);
-  writeFileSync(task.outputFile, json, 'utf-8');
+  await Bun.write(task.outputFile, json);
 
   console.log(`Analytics written to ${task.outputFile}`);
 }

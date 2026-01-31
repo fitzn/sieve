@@ -48,9 +48,8 @@ Installation
 
 1. Download and install [Bun](https://bun.sh/).
 2. Install the [AWS CLI](https://aws.amazon.com/cli/).
-3. Install [Node](https://nodejs.org/) (for the web server)
-4. Download or clone the Sieve Git repository.
-5. No build step is required - Bun executes TypeScript files directly!
+3. Download or clone the Sieve Git repository.
+4. No build step is required - Bun executes TypeScript files directly!
 
 
 Usage

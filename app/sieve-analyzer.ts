@@ -1,5 +1,5 @@
-import { LoggedRequest, SieveAnalytics, SieveDailyStats, SieveMonthlyStats } from './Model';
-import { SieveFilter } from './SieveFilter';
+import { LoggedRequest, SieveAnalytics, SieveDailyStats, SieveMonthlyStats } from './model';
+import { SieveFilter } from './sieve-filter';
 
 const MAX_SESSION_MS = 30 * 60 * 1000;
 

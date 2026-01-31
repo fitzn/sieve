@@ -4,7 +4,7 @@
 # Validate arguments.
 #
 
-RequiredSieveEntry=app/SieveMain.ts
+RequiredSieveEntry=app/sieve-main.ts
 
 if [ ! -f $RequiredSieveEntry ]; then
   echo "error: missing required file $RequiredSieveEntry"
