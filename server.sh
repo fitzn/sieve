@@ -1,11 +1,14 @@
 #!/bin/bash
 
-cat << 'EOF' | bun -
+# Directory to serve - change this to serve a different directory
+WEB_DIR="./web"
+
+cat << EOF | bun -
 const server = Bun.serve({
   port: 8080,
   async fetch(req) {
     const url = new URL(req.url);
-    let path = "./web" + url.pathname;
+    let path = "${WEB_DIR}" + url.pathname;
     if (path.endsWith("/")) path += "index.html";
 
     const file = Bun.file(path);
@@ -17,6 +20,6 @@ const server = Bun.serve({
     return new Response(file);
   },
 });
-console.log("🚀 Serving ./web at http://localhost:8080");
+console.log("🚀 Serving ${WEB_DIR} at http://localhost:8080");
 EOF
 
