@@ -1,7 +1,5 @@
 #!/bin/bash
 
-Directory="./web"
-
 cat << 'EOF' | bun -
 const server = Bun.serve({
   port: 8080,
