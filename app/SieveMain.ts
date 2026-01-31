@@ -41,8 +41,7 @@ function runMonthsTask(task: MonthsTask): void {
 
   const prefixes: string[] = [];
   for (let i = 0; i <= prev; i++) {
-    const date = new Date(current);
-    date.setMonth(current.getMonth() - i);
+    const date = new Date(current.getFullYear(), current.getMonth() - i, 1);
     
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
