@@ -176,17 +176,19 @@ function getPrettyMonth(id: string): string {
   return `${monthName} ${year}`;
 }
 
-function getSessionDurations(timestamps: number[], durations: number[] = []): number[] {
-  if (timestamps.length === 0) {
-    return durations;
+function getSessionDurations(timestamps: number[]): number[] {
+  const durations: number[] = [];
+  let remaining = [...timestamps];
+
+  while (remaining.length > 0) {
+    const start = Math.min(...remaining);
+    const inSession = remaining.filter(t => t < start + MAX_SESSION_MS);
+    const durationMs = Math.max(...inSession) - start;
+    durations.push(durationMs);
+    remaining = remaining.filter(t => t >= start + MAX_SESSION_MS);
   }
 
-  const start = Math.min(...timestamps);
-  const inSession = timestamps.filter(t => t < start + MAX_SESSION_MS);
-  const afterSession = timestamps.filter(t => t >= start + MAX_SESSION_MS);
-  const durationMs = Math.max(...inSession) - start;
-
-  return getSessionDurations(afterSession, [...durations, durationMs]);
+  return durations;
 }
 
 interface State {
