@@ -10,7 +10,7 @@ export async function readCloudFrontLogsDir(path: string): Promise<LogSlice[]> {
   for (const filename of files) {
     const fullPath = `${path}/${filename}`;
     const contents = await readGzipFileLines(fullPath);
-    const allRequests = contents.filter(line => !line.startsWith('#'));
+    const allRequests = contents.filter(line => !line.startsWith('#') && line.length > 0);
 
     let requests: LoggedRequest[] = [];
     if (!contents[0] || contents[0] !== CF_LOGS_VERSION_ONE_HEADER) {
