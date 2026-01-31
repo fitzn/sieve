@@ -55,7 +55,8 @@ async function runComputeTask(task: ComputeTask): Promise<void> {
   
   const filter = await SieveFilter.create({
     keepOnly2xx3xx: true,
-    ipPrefixBlockFilePath: 'app/resources/blocked-ip-prefixes.txt'
+    ipPrefixBlockFilePath: 'app/resources/blocked-ip-prefixes.txt',
+    excludePHPReqs: true
   });
 
   const analyzer = new SieveAnalyzer(filter);

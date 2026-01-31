@@ -3,6 +3,7 @@ import { LoggedRequest } from './model';
 export interface SieveFilterConfig {
   keepOnly2xx3xx: boolean;
   ipPrefixBlockFilePath?: string;
+  excludePHPReqs?: boolean;
 }
 
 export class SieveFilter {
@@ -41,6 +42,8 @@ export class SieveFilter {
     const hasBlockedIP = request.c_ip !== undefined && 
       Array.from(this.blockedPrefixIPs).some(prefix => request.c_ip!.startsWith(prefix));
 
-    return isWrongStatusType || hasBlockedIP;
+    const isExcludedPHPRequest = this.config.excludePHPReqs && request.cs_uri_stem?.endsWith('.php');
+
+    return isWrongStatusType || hasBlockedIP || isExcludedPHPRequest;
   }
 }
