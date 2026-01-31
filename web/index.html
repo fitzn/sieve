@@ -14,7 +14,7 @@
             console.log('Loading analytics for ' + siteId)
 
             fetch(`/data/${siteId}.json`).then(response => response.json()).then(data => {
-                let maxMonthStarts = 3
+                let maxMonthStarts = 4
                 let startIdx = 0
                 for (let i = data.daily.length - 1; i >= 0; i--) {
                     if (data.daily[i].date.endsWith("01")) {
@@ -90,8 +90,8 @@
                         }
                     }
 
-                    sortTakeAndAdd(month.referrals, 10, document.getElementById('referral-table'))
-                    sortTakeAndAdd(month.pages, 10, document.getElementById('pages-table'))
+                    sortTakeAndAdd(month.referrals, 20, document.getElementById('referral-table'))
+                    sortTakeAndAdd(month.pages, 50, document.getElementById('pages-table'))
                 }
             })
         }
