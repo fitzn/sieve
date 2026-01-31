@@ -42,8 +42,8 @@ export class SieveFilter {
     const hasBlockedIP = request.c_ip !== undefined && 
       Array.from(this.blockedPrefixIPs).some(prefix => request.c_ip!.startsWith(prefix));
 
-    const isPHPRequest = this.config.excludePHPReqs && request.cs_uri_stem?.endsWith('.php');
+    const isExcludedPHPRequest = this.config.excludePHPReqs && request.cs_uri_stem?.endsWith('.php');
 
-    return isWrongStatusType || hasBlockedIP || isPHPRequest;
+    return isWrongStatusType || hasBlockedIP || isExcludedPHPRequest;
   }
 }
