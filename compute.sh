@@ -33,7 +33,17 @@ PreviousMonthsSync=3
 bun run $RequiredSieveEntry months $PreviousMonthsSync | \
   while read prefix ; do
     echo "Syncing $prefix:"
-    aws s3 sync --exclude="*" --include="*$prefix*" s3://$BucketAndPath $LogDirectory
+    sync_output=$(aws s3 sync --exclude="*" --include="*$prefix*" s3://$BucketAndPath $LogDirectory)
+    echo "$sync_output"
+    
+    # Count the number of files synced (lines starting with "download:")
+    files_synced=$(echo "$sync_output" | grep -c "^download:")
+    
+    # If no files were synced, break early
+    if [ "$files_synced" -eq 0 ]; then
+      echo "No files synced for $prefix - stopping early"
+      break
+    fi
   done
 
 #
