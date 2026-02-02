@@ -37,12 +37,7 @@ bun run $RequiredSieveEntry months $PreviousMonthsSync | \
     echo "$sync_output"
     
     # Count the number of files synced (lines starting with "download:")
-    files_synced=$(echo "$sync_output" | grep -c "^download:" || echo "0")
-    
-    # Validate that files_synced is a number
-    if ! [[ "$files_synced" =~ ^[0-9]+$ ]]; then
-      files_synced=0
-    fi
+    files_synced=$(echo "$sync_output" | grep -c "^download:")
     
     # If no files were synced, break early
     if [ "$files_synced" -eq 0 ]; then
